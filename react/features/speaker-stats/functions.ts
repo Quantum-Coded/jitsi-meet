@@ -4,6 +4,7 @@ import { IReduxState } from '../app/types';
 import { getConferenceTimestamp } from '../base/conference/functions';
 import { PARTICIPANT_ROLE } from '../base/participants/constants';
 import { getParticipantById } from '../base/participants/functions';
+import { normalizeAccents } from '../base/util/strings';
 import { FaceLandmarks } from '../face-landmarks/types';
 
 import { THRESHOLD_FIXED_AXIS } from './constants';
@@ -179,13 +180,13 @@ export function filterBySearchCriteria(state: IReduxState, stats?: ISpeakerStats
     const criteria = getSearchCriteria(state);
 
     if (criteria !== null) {
-        const searchRegex = new RegExp(criteria, 'gi');
+        const searchRegex = new RegExp(normalizeAccents(criteria).trim(), 'gi');
 
         for (const id in filteredStats) {
             if (filteredStats[id].hasOwnProperty('_isLocalStats')) {
                 const name = filteredStats[id].getDisplayName();
 
-                filteredStats[id].hidden = !name?.match(searchRegex);
+                filteredStats[id].hidden = !normalizeAccents(name ?? '').match(searchRegex);
             }
         }
     }
